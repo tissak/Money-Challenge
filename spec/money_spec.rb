@@ -1,11 +1,27 @@
 require 'money'
 
 describe Money do
+  it "should not allow more than 2 arguments" do    
+    lambda {Money.new(1,1,1)}.should raise_error
+  end
+
+  it "should not allow less than 1 argument" do    
+    lambda { Money.new() }.should raise_error
+  end
+  
   it "should handle an init string of 1.00" do
     money = Money.new("1.00")
     money.dollars.should == 1
     money.cents.should == 0
   end
+
+  #edge case.. we should handle 1.20 even if there are extra zeroes
+  it "should handle an init string of 1.20" do
+    money = Money.new("1.2000000")
+    money.dollars.should == 1
+    money.cents.should == 20
+  end
+
 
   it "should handle an init string of 1.15" do
     money = Money.new("1.15")
@@ -13,12 +29,17 @@ describe Money do
     money.cents.should == 15
   end
 
-  it "should handle an init string of 1.15" do
+  it "should handle an init string of 1.05" do
     money = Money.new("1.05")
     money.dollars.should == 1
     money.cents.should == 5
   end
-
+  
+  it "should handle an init string of 0.10" do
+    money = Money.new("0.10")
+    money.dollars.should == 0
+    money.cents.should == 10
+  end
 
   it "should handle an init integer" do
     money = Money.new(1)
@@ -43,6 +64,13 @@ describe Money do
     money.dollars.should == 1
     money.cents.should == 0
   end
+
+  it "should handle an init float 0.01" do
+    money = Money.new(0.01)
+    money.dollars.should == 0
+    money.cents.should == 1
+  end
+
   
   it "should handle an init float 1.05" do
     money = Money.new(1.05)
@@ -50,9 +78,15 @@ describe Money do
     money.cents.should == 5
   end
   
-  it "should handle in init of dollar and cent amounts" do
+  it "should handle in init of dollar and cent amounts 1,10" do
     money = Money.new(1,10)
     money.dollars.should == 1
+    money.cents.should == 10
+  end
+  
+  it "should handle in init of dollar and cent amounts 0,10" do
+    money = Money.new(0,10)
+    money.dollars.should == 0
     money.cents.should == 10
   end
   
@@ -84,10 +118,6 @@ describe Money do
   it "should convert to a float correctly $1.50 to 1.50" do
     money = Money.new(1,50)
     money.to_f.should == 1.5
-  end
-  
-  it "should not allow more than 2 arguments" do    
-    lambda {Money.new(1,1,1)}.should raise_error
   end
   
   it "should ignore decimals for portion amounts" do
